@@ -1,0 +1,5 @@
+[project]
+title = native_logger
+
+[library]
+include_dirs = native_logger

@@ -1,0 +1,16 @@
+- name: native_logger
+  type: table
+  desc: Log in release builds for android and ios
+
+  members:
+
+#*****************************************************************************************************
+
+  - name: log
+    type: function
+
+    parameters:
+      - name: log_level
+        type: int
+      - name: message
+        type: string
