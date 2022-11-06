@@ -6,6 +6,9 @@ static android_LogPriority ToAndroidPriority(int severity)
 {
     switch (severity)
     {
+        case 0:
+            return ANDROID_LOG_DEBUG;
+            
         case 1:
             return ANDROID_LOG_DEBUG;
 

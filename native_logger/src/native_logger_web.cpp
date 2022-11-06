@@ -6,7 +6,7 @@ void NativeLogger_LogInternal(int severity, const char* message)
 {
     EM_ASM({
         try {
-            if ($1 == 1)
+            if ($1 == 1 || $1 == 0)
                 console.debug(UTF8ToString($0));
             else if($1 == 3)
                 console.warn(UTF8ToString($0));
