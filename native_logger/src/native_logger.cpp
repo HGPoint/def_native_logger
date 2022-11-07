@@ -9,7 +9,6 @@
 #include "native_logger_utils.h"
 #include <stdlib.h> // free
 
-
 struct NativeLoggerModule
 {
     NativeLoggerModule()
@@ -37,6 +36,11 @@ struct NativeLoggerModule
 };
 
 static NativeLoggerModule g_NativeLoggerModule;
+#if defined(DM_DEBUG)
+static bool isDebugMode = true;
+#else
+static bool isDebugMode = false;
+#endif
 
 static int log(lua_State *L)
 {
@@ -97,15 +101,13 @@ static const luaL_reg Module_methods[] =
         {"log", log},
         {"set_engine_log_level", set_engine_log_level},
         {"set_listener", set_native_log_listener},
-        {0, 0}
-    };
+        {0, 0}};
 
-
-
-static void addMsgToQ(int log_level,const char *domain,const char *formatted_string){
+static void addMsgToQ(int log_level, const char *domain, const char *formatted_string)
+{
     dmNativeLogger::Command cmd;
     cmd.m_Severity = log_level;
-    cmd.m_Domain =strdup(domain);
+    cmd.m_Domain = strdup(domain);
     cmd.m_Message = strdup(formatted_string);
     dmNativeLogger::QueuePush(&g_NativeLoggerModule.m_CommandQueue, &cmd);
 }
@@ -137,7 +139,12 @@ void InternalLogListener(LogSeverity severity, const char *domain, const char *f
         assert(0);
         break;
     }
-    NativeLogger_LogInternal(log_level, formatted_string);
+    
+    // Skip printing, to avoid duplicates
+    if (!isDebugMode)
+    {
+        NativeLogger_LogInternal(log_level, formatted_string);
+    }
     addMsgToQ(log_level, domain, formatted_string);
 #endif
 }
@@ -190,7 +197,6 @@ void HandleCommand(dmNativeLogger::Command *cmd)
     if (cmd->m_Message)
         free((void *)cmd->m_Message);
 }
-
 
 static dmExtension::Result AppInitializeNativeLogger(dmExtension::AppParams *params)
 {
